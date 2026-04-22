@@ -1,0 +1,22 @@
+# === OS ===
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# === Editor / IDE ===
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# === Node (if any) ===
+node_modules/
+
+# === Build tools / scripts ===
+generate-responses.js
+
+# === Skill / plugin reference files (not part of the app) ===
+design-for-ai/
+systems-design.skill/
+SKILL.md

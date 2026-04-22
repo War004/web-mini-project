@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Survey Analytics Dashboard — Analyze survey responses with rich visualizations, demographic breakdowns, and export to CSV, JSON, and PDF.">
+  <title>Survey Analytics — Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+
+  <!-- ===== FLOATING TOP NAVIGATION ===== -->
+  <nav class="top-nav" id="topNav" aria-label="Main navigation">
+    <button class="top-nav__tab top-nav__tab--active" data-view="overview" id="tab-overview">Overview</button>
+    <button class="top-nav__tab" data-view="responses" id="tab-responses">Responses</button>
+    <button class="top-nav__tab" data-view="questions" id="tab-questions">Questions</button>
+    <button class="top-nav__tab" data-view="demographics" id="tab-demographics">Demographics</button>
+  </nav>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-content" id="mainContent">
+
+    <!-- Survey Header -->
+    <header class="survey-header" id="surveyHeader">
+      <h1 class="survey-header__title" id="surveyTitle">Loading…</h1>
+      <div class="survey-header__meta" id="surveyMeta">
+        <span id="responseCount">—</span>
+        <span class="survey-header__dot"></span>
+        <span id="surveyDateRange">—</span>
+      </div>
+    </header>
+
+    <!-- ===== OVERVIEW VIEW ===== -->
+    <section class="view-section view-section--active" id="view-overview" aria-label="Overview">
+      
+      <!-- Key Metrics -->
+      <div class="metrics-row" id="metricsRow">
+        <div class="metric-card">
+          <div class="metric-card__value" id="metricTotal">—</div>
+          <div class="metric-card__label">Total Responses</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card__value" id="metricCompletion">—</div>
+          <div class="metric-card__label">Completion Rate</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-card__value" id="metricAvgTime">—</div>
+          <div class="metric-card__label">Avg. Time</div>
+        </div>
+        <div class="metric-card metric-card--accent">
+          <div class="metric-card__value" id="metricNPS">—</div>
+          <div class="metric-card__label">NPS Score</div>
+        </div>
+      </div>
+
+      <!-- Charts (shown when data exists) -->
+      <div class="charts-row" id="overviewCharts">
+        <div class="chart-container chart-container--tall">
+          <button class="chart-download-btn" data-chart="trendChart" title="Download as PNG">⤓ PNG</button>
+          <canvas id="trendChart"></canvas>
+        </div>
+        <div class="chart-container chart-container--tall">
+          <button class="chart-download-btn" data-chart="satisfactionDonut" title="Download as PNG">⤓ PNG</button>
+          <canvas id="satisfactionDonut"></canvas>
+        </div>
+      </div>
+
+      <!-- Empty state (shown when no data matches filters) -->
+      <div class="empty-state" id="overviewEmpty" style="display: none;">
+        <img src="assets/empty-state.png" alt="No data found" class="empty-state__img">
+        <p class="empty-state__text">No responses match your current filters.</p>
+        <button class="btn-ghost" id="emptyStateClearFilters">Clear Filters</button>
+      </div>
+    </section>
+
+    <!-- ===== RESPONSES VIEW ===== -->
+    <section class="view-section" id="view-responses" aria-label="Individual Responses">
+      <h2>Individual Responses</h2>
+
+      <div class="search-bar" id="searchBar">
+        <span class="search-bar__icon">⌕</span>
+        <input type="text" class="search-bar__input" id="searchInput" placeholder="Search responses…" aria-label="Search responses">
+      </div>
+
+      <div class="responses-table-wrapper">
+        <table class="responses-table" id="responsesTable">
+          <thead>
+            <tr id="responsesTableHead"></tr>
+          </thead>
+          <tbody id="responsesTableBody"></tbody>
+        </table>
+        <div class="table-pagination" id="tablePagination">
+          <span id="paginationInfo">—</span>
+          <div class="table-pagination__btns">
+            <button class="table-pagination__btn" id="prevPage" disabled>← Prev</button>
+            <button class="table-pagination__btn" id="nextPage">Next →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== QUESTIONS VIEW ===== -->
+    <section class="view-section" id="view-questions" aria-label="Question Analysis">
+      <h2>Question Analysis</h2>
+      <div id="questionsContainer"></div>
+    </section>
+
+    <!-- ===== DEMOGRAPHICS VIEW ===== -->
+    <section class="view-section" id="view-demographics" aria-label="Demographics">
+      <h2>Demographics</h2>
+      <div class="demo-grid" id="demographicsContainer"></div>
+    </section>
+
+  </main>
+
+  <!-- ===== FILTER PANEL (floats above bottom bar) ===== -->
+  <div class="filter-panel" id="filterPanel">
+    <div class="filter-panel__title">Filters</div>
+    
+    <div class="filter-panel__group">
+      <label class="filter-panel__label">Date Range</label>
+      <div class="filter-panel__row">
+        <input type="date" class="filter-panel__input" id="filterDateStart" aria-label="Start date">
+        <input type="date" class="filter-panel__input" id="filterDateEnd" aria-label="End date">
+      </div>
+    </div>
+
+    <div class="filter-panel__group">
+      <label class="filter-panel__label">Demographic Segment</label>
+      <select class="filter-panel__select" id="filterDemoKey" aria-label="Segment type">
+        <option value="">All Segments</option>
+      </select>
+    </div>
+
+    <div class="filter-panel__group" id="filterDemoValueGroup" style="display:none;">
+      <label class="filter-panel__label">Segment Value</label>
+      <select class="filter-panel__select" id="filterDemoValue" aria-label="Segment value">
+        <option value="">All Values</option>
+      </select>
+    </div>
+
+    <div class="filter-panel__actions">
+      <button class="btn-ghost" id="clearFilters">Clear</button>
+      <button class="bottom-bar__export" id="applyFilters" style="font-size: var(--text-sm);">Apply</button>
+    </div>
+  </div>
+
+
+
+
+  <!-- ===== FLOATING BOTTOM ACTION BAR ===== -->
+  <div class="bottom-bar" id="bottomBar">
+    <div class="bottom-bar__tools">
+      <a href="https://www.example.com" target="_blank" class="bottom-bar__btn" id="btnSurveySelect" title="Go to Survey">
+        ☰ <span class="bottom-bar__btn-label">Survey</span>
+      </a>
+      <button class="bottom-bar__btn" id="btnFilter" title="Filters">
+        ⚙ <span class="bottom-bar__btn-label">Filter</span>
+      </button>
+    </div>
+
+    <div class="bottom-bar__divider"></div>
+
+    <button class="bottom-bar__export" id="btnExport" title="Export data">
+      Export ↓
+    </button>
+
+    <!-- Export Dropdown -->
+    <div class="export-dropdown" id="exportDropdown">
+      <button class="export-dropdown__item" id="exportCSV">📄 Export as CSV</button>
+      <button class="export-dropdown__item" id="exportJSON">{ } Export as JSON</button>
+      <button class="export-dropdown__item" id="exportPDF">🖨 Export as PDF</button>
+    </div>
+  </div>
+
+  <!-- ===== SCRIPTS (order matters: dependencies first) ===== -->
+  <script src="js/state.js"></script>
+  <script src="js/analytics.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

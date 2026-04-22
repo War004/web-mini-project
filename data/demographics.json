@@ -1,0 +1,24 @@
+{
+  "segments": {
+    "ageGroup": {
+      "label": "Age Group",
+      "values": ["18-24", "25-34", "35-44", "45-54", "55+"]
+    },
+    "department": {
+      "label": "Department",
+      "values": ["Engineering", "Marketing", "Sales", "Support", "Product", "HR", "Finance"]
+    },
+    "location": {
+      "label": "Location",
+      "values": ["North America", "Europe", "Asia Pacific", "Latin America", "Middle East & Africa"]
+    },
+    "tenure": {
+      "label": "Tenure",
+      "values": ["< 1 year", "1-2 years", "3-5 years", "5-10 years", "10+ years"]
+    },
+    "role": {
+      "label": "Role",
+      "values": ["Individual Contributor", "Team Lead", "Manager", "Director", "Executive"]
+    }
+  }
+}
